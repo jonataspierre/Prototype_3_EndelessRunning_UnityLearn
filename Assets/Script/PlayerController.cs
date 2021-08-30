@@ -16,8 +16,11 @@ public class PlayerController : MonoBehaviour
 
     public float jumpForce = 10f;
     public float gravityModifier;
+    private float upBound = 10;
+    public bool canDoubleJump;
     public bool isOnGround = true;
     public bool gameOver;
+    public bool doubleSpeed = false;
     
     // Start is called before the first frame update
     void Start()
@@ -32,15 +35,39 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.Space))
-        if (Input.GetButtonDown("Jump") && isOnGround && !gameOver)
+        // Check if the space button was pressed to jump
+        if (Input.GetButtonDown("Jump"))
+        {   
+            if (isOnGround && !gameOver)
+            {
+                isOnGround = false;
+                canDoubleJump = true;
+                Jump();
+            }
+            else if (Input.GetButtonDown("Jump") && canDoubleJump && !gameOver)
+            {
+                canDoubleJump = false;
+                Jump();
+            }            
+        }
+
+        // Constrains the player on the up bound
+        if (transform.position.y > upBound)
         {
-            //Debug.Log("apertou");            
-            playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            isOnGround = false;
-            playerAnim.SetTrigger("Jump_trig");
-            dirtParticle.Stop();
-            playerAudio.PlayOneShot(jumpSound, 1f);
+            playerRB.velocity = Vector3.zero;
+            playerRB.AddForce(Vector3.zero);
+        }
+
+        // Verify if the horizontal arrow buttons was pressed for dash speed
+        if (Input.GetButton("Horizontal") && !gameOver)
+        {
+            doubleSpeed = true;
+            playerAnim.SetFloat("Speed_Multiplier", 2f);
+        }
+        else if (doubleSpeed)
+        {
+            doubleSpeed = false;
+            playerAnim.SetFloat("Speed_Multiplier", 1f);
         }
     }
 
@@ -50,6 +77,7 @@ public class PlayerController : MonoBehaviour
         {
             isOnGround = true;
             dirtParticle.Play();
+            playerAnim.SetBool("Jump_b", false);
         }
         else if (collision.gameObject.CompareTag("Obstacle") && !gameOver)
         {
@@ -61,5 +89,14 @@ public class PlayerController : MonoBehaviour
             dirtParticle.Stop();
             playerAudio.PlayOneShot(crashSound, 1f);
         }
+    }
+
+    void Jump()
+    {
+        playerRB.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);        
+        playerAnim.SetTrigger("Jump_trig");
+        playerAnim.SetBool("Jump_b", true);
+        dirtParticle.Stop();
+        playerAudio.PlayOneShot(jumpSound, 1f);
     }
 }
