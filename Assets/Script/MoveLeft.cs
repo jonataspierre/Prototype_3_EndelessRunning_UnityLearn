@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class MoveLeft : MonoBehaviour
 {
+    private GameManager gameManager;
+
+    public int pointValue;
+
     private float speed = 25f;
     private float leftBound = -15f;
     private PlayerController playerControllerScript;
@@ -11,6 +15,8 @@ public class MoveLeft : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
@@ -31,6 +37,7 @@ public class MoveLeft : MonoBehaviour
 
         if (transform.position.x < leftBound && gameObject.CompareTag("Obstacle"))
         {
+            gameManager.UpdateScore(pointValue);
             Destroy(gameObject);
         }
     }

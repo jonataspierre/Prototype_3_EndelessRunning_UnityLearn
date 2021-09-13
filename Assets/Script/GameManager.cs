@@ -2,10 +2,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public float score;
+    public TextMeshProUGUI scoreText;
+    private int score;
+
+    public TextMeshProUGUI gameOverText;
+    public Button restartButton;
+
     private float startSpeed = 5f;
 
     public Transform startingPoint;
@@ -15,7 +23,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         playerControllerScript = GameObject.Find("Player").GetComponent<PlayerController>();
-        score = 0f;
+        score = 0;
 
         playerControllerScript.gameOver = true;
         StartCoroutine(PlayIntro());
@@ -24,18 +32,20 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!playerControllerScript.gameOver)
-        {
-            if (playerControllerScript.doubleSpeed)
-            {
-                score += 2;
-            }
-            else
-            {
-                score++;
-            }
-            Debug.Log("Score: " + score);
-        }
+        
+        // score play speed
+        //if (!playerControllerScript.gameOver)
+        //{
+        //    if (playerControllerScript.doubleSpeed)
+        //    {
+        //        score += 2;
+        //    }
+        //    else
+        //    {
+        //        score++;
+        //    }
+        //    Debug.Log("Score: " + score);
+        //}
     }
 
     IEnumerator PlayIntro()
@@ -61,5 +71,24 @@ public class GameManager : MonoBehaviour
 
         playerControllerScript.GetComponent<Animator>().SetFloat("Speed_Multiplier", 1.0f);
         playerControllerScript.gameOver = false;
+    }
+
+    public void UpdateScore(int scoreToAdd)
+    {
+        score += scoreToAdd;
+
+        scoreText.text = "Score: " + score;
+    }
+
+    public void GameOver()
+    {
+        gameOverText.gameObject.SetActive(true);
+        restartButton.gameObject.SetActive(true);
+        //isGameActive = false;
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(0);
     }
 }

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    private GameManager gameManager;
+
     private Rigidbody playerRB;
     private Animator playerAnim;
     public ParticleSystem explosionParticle;
@@ -25,6 +27,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+
         playerRB = GetComponent<Rigidbody>();
         playerAnim = GetComponent<Animator>();
         playerAudio = GetComponent<AudioSource>();
@@ -88,6 +92,8 @@ public class PlayerController : MonoBehaviour
             explosionParticle.Play();
             dirtParticle.Stop();
             playerAudio.PlayOneShot(crashSound, 1f);
+
+            gameManager.GameOver();
         }
     }
 
